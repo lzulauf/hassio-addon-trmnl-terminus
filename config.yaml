@@ -6,7 +6,7 @@ description: >
 arch:
   - amd64
   - aarch64
-url: https://github.com/lzulauf/hassio-addons/tree/dev/trmnl-terminus
+url: https://github.com/lzulauf/hassio-addon-trmnl-terminus
 startup: services
 init: false
 boot: auto
