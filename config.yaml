@@ -1,0 +1,36 @@
+name: TRMNL Terminus
+version: 0.1.0
+slug: trmnl_terminus
+description: >
+  A self-hosted TRMNL Terminus server for Home Assistant.
+arch:
+  - amd64
+  - aarch64
+url: https://github.com/lzulauf/hassio-addons/tree/dev/trmnl-terminus
+startup: services
+init: false
+boot: auto
+ingress: true
+ingress_port: 2300
+ingress_stream: true
+ports:
+  2300/tcp: 2300
+ports_description:
+  2300/tcp: Terminus web and API port
+map:
+  - addon_config:rw
+stage: experimental
+options:
+  api_uri: "http://homeassistant.local:2300"
+  database_url: "postgres://terminus:change_me@homeassistant.local:5432/terminus"
+  keyvalue_url: "redis://:change_me@homeassistant.local:6379/0"
+  app_secret: ""
+  app_setup: true
+  certificate_urls: ""
+schema:
+  api_uri: str
+  database_url: str
+  keyvalue_url: str
+  app_secret: password?
+  app_setup: bool
+  certificate_urls: str?
