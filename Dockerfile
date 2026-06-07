@@ -46,6 +46,7 @@ RUN apk add --no-cache \
         bash \
         ca-certificates \
         curl \
+        git \
         libffi-dev \
         linux-headers \
         nodejs \
@@ -90,7 +91,7 @@ RUN apk add --no-cache \
         chromium \
         curl \
         font-noto-cjk \
-    git \
+        git \
         imagemagick \
         jq \
         libffi \
