@@ -1,0 +1,21 @@
+services:
+  terminus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: trmnl-terminus-local:latest
+    ports:
+      - "2300:2300"
+    volumes:
+      - ./compose/options.json:/data/options.json:ro
+      - terminus-config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:2300/up || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped
+
+volumes:
+  terminus-config:
