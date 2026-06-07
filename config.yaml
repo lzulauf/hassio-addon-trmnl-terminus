@@ -1,5 +1,5 @@
 name: TRMNL Terminus
-version: 0.1.1-dev1
+version: 0.1.1-dev2
 slug: trmnl_terminus
 description: >
   A self-hosted TRMNL Terminus server for Home Assistant.
@@ -22,15 +22,11 @@ map:
 stage: experimental
 options:
   api_uri: "http://homeassistant.local:2300"
-  database_url: "postgres://terminus:change_me@homeassistant.local:5432/terminus"
-  keyvalue_url: "redis://:change_me@homeassistant.local:6379/0"
   app_secret: ""
   app_setup: true
   certificate_urls: ""
 schema:
   api_uri: str
-  database_url: str
-  keyvalue_url: str
   app_secret: password?
   app_setup: bool
   certificate_urls: str?
