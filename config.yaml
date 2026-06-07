@@ -7,6 +7,7 @@ arch:
   - aarch64
   - amd64
 url: https://github.com/lzulauf/hassio-addon-trmnl-terminus
+image: ghcr.io/lzulauf/hassio-trmnl-terminus
 startup: services
 init: false
 boot: auto
