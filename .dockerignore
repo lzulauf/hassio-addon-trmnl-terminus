@@ -1,0 +1,7 @@
+*
+!Dockerfile
+!run.sh
+!lib/
+!lib/**
+!sql/
+!sql/**
