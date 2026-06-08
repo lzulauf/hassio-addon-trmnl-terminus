@@ -1,5 +1,5 @@
 name: TRMNL Terminus
-version: 0.2.0-dev5
+version: 0.2.0-dev6
 slug: trmnl_terminus
 description: >
   A self-hosted TRMNL Terminus server for Home Assistant. Connect TRMNL devices
@@ -17,6 +17,9 @@ boot: auto
 ingress: true
 ingress_port: 2300
 ingress_stream: true
+ingress_entry: /
+panel_title: TRMNL Terminus
+panel_icon: mdi:tablet-dashboard
 ports:
   2300/tcp: 2300
 ports_description:
