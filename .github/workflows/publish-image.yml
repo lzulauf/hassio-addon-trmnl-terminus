@@ -73,18 +73,10 @@ jobs:
         id: setup_buildx
         continue-on-error: true
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker-container
-          driver-opts: |
-            image=ghcr.io/moby/buildkit:buildx-stable-1
 
       - name: Retry Docker Buildx setup
         if: steps.setup_buildx.outcome == 'failure'
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker-container
-          driver-opts: |
-            image=ghcr.io/moby/buildkit:buildx-stable-1
 
       - name: Build and push multi-arch image
         id: build
@@ -140,18 +132,10 @@ jobs:
         id: setup_buildx
         continue-on-error: true
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker-container
-          driver-opts: |
-            image=ghcr.io/moby/buildkit:buildx-stable-1
 
       - name: Retry Docker Buildx setup
         if: steps.setup_buildx.outcome == 'failure'
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker-container
-          driver-opts: |
-            image=ghcr.io/moby/buildkit:buildx-stable-1
 
       - name: Create and push multi-arch manifest
         shell: bash
