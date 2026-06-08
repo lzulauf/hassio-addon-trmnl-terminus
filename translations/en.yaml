@@ -1,0 +1,15 @@
+configuration:
+  api_uri:
+    name: API URI
+    description: URL that TRMNL devices use to reach this server, for example http://homeassistant.local:2300. Recommendation: set this to the exact URL your devices can reach.
+  app_secret:
+    name: App Secret
+    description: Secret used by Terminus for signed and encrypted app data. Recommendation: leave empty so the add-on auto-generates and persists it at /config/.app_secret.
+  app_setup:
+    name: Run Setup Tasks
+    description: Run setup tasks such as asset setup and database migrations on startup. Recommendation: keep enabled (true) for normal operation.
+  certificate_urls:
+    name: Certificate URLs
+    description: Optional comma-separated certificate URLs to trust additional certificate authorities. Recommendation: leave empty unless you use private or self-signed certificates.
+network:
+  "2300/tcp": Terminus web and API port

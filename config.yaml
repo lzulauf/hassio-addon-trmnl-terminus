@@ -1,8 +1,11 @@
 name: TRMNL Terminus
-version: 0.2.0-dev4
+version: 0.2.0-dev5
 slug: trmnl_terminus
 description: >
-  A self-hosted TRMNL Terminus server for Home Assistant.
+  A self-hosted TRMNL Terminus server for Home Assistant. Connect TRMNL devices
+  to your own server, manage displays locally, and keep data on infrastructure
+  you control. Ideal for TRMNL owners who want a private, Home Assistant-based
+  BYOS setup instead of relying on a hosted service.
 arch:
   - aarch64
   - amd64
