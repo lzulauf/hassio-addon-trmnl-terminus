@@ -71,7 +71,11 @@ RUN npm ci --no-audit --no-fund
 RUN bundle config set deployment true
 RUN bundle config set without "development quality test tools"
 RUN bundle install --jobs "$(nproc)" --retry 3
-RUN bundle exec hanami assets compile
+RUN API_URI="http://localhost:2300" \
+    KEYVALUE_URL="redis://localhost:6379/0" \
+    DATABASE_URL="postgres://terminus:terminus@127.0.0.1:5432/terminus" \
+    APP_SECRET="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" \
+    bundle exec hanami assets compile
 
 FROM ghcr.io/home-assistant/base:latest
 
