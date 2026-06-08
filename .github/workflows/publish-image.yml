@@ -10,13 +10,19 @@ on:
       - .github/workflows/publish-image.yml
   workflow_dispatch:
 
+concurrency:
+  group: publish-trmnl-terminus-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
 
 jobs:
-  publish:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.value }}
 
     steps:
       - name: Checkout
@@ -34,7 +40,26 @@ jobs:
           fi
           echo "value=${version}" >> "${GITHUB_OUTPUT}"
 
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+            qemu: false
+          - arch: arm64
+            platform: linux/arm64
+            qemu: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
+        if: matrix.qemu
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
@@ -48,17 +73,87 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push multi-arch image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/hassio-trmnl-terminus:${{ steps.version.outputs.value }}
+          outputs: type=image,push-by-digest=true,name-canonical=true
           labels: |
-            io.hass.version=${{ steps.version.outputs.value }}
+            io.hass.version=${{ needs.prepare.outputs.version }}
             io.hass.type=addon
             io.hass.arch=aarch64|amd64
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.version=${{ steps.version.outputs.value }}
+            org.opencontainers.image.version=${{ needs.prepare.outputs.version }}
+
+      - name: Persist digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/digests
+          printf '%s' "${{ steps.build.outputs.digest }}" > "/tmp/digests/${{ matrix.arch }}.txt"
+
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ matrix.arch }}
+          path: /tmp/digests/${{ matrix.arch }}.txt
+          retention-days: 1
+
+  merge-manifest:
+    needs:
+      - prepare
+      - build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download digest artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: digest-*
+          path: /tmp/digests
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${{ github.repository_owner }}/hassio-trmnl-terminus"
+          version="${{ needs.prepare.outputs.version }}"
+          amd64_digest="$(cat /tmp/digests/amd64.txt)"
+          arm64_digest="$(cat /tmp/digests/arm64.txt)"
+
+          docker buildx imagetools create \
+            --tag "${image}:${version}" \
+            "${image}@${amd64_digest}" \
+            "${image}@${arm64_digest}"
+
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            docker buildx imagetools create \
+              --tag "${image}:latest" \
+              "${image}@${amd64_digest}" \
+              "${image}@${arm64_digest}"
+          fi
+
+      - name: Verify manifest contains both architectures
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${{ github.repository_owner }}/hassio-trmnl-terminus"
+          version="${{ needs.prepare.outputs.version }}"
+          output="$(docker buildx imagetools inspect "${image}:${version}")"
+          printf '%s\n' "${output}"
+          printf '%s\n' "${output}" | grep -q 'linux/amd64'
+          printf '%s\n' "${output}" | grep -q 'linux/arm64'

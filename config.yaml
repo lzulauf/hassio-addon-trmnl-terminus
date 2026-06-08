@@ -1,5 +1,5 @@
 name: TRMNL Terminus
-version: 0.2.0-dev2
+version: 0.2.0-dev3
 slug: trmnl_terminus
 description: >
   A self-hosted TRMNL Terminus server for Home Assistant.
